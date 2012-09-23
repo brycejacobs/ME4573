@@ -44,8 +44,16 @@ model *LoadedObject::getModel() {
 elem *LoadedObject::getElems() {
 	return this->elems;
 }
+
+int LoadedObject::getElemCount() {
+	return _elemCount;
+}
 vert *LoadedObject::getVerts() {
 	return this->verts;
+}
+
+int LoadedObject::getVertCount() {
+	return _vertCount;
 }
 
 void LoadedObject::printVert(struct vert *ourVert) {

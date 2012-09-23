@@ -4,11 +4,11 @@
 #include "LoadedObject.h"
 
 
-#ifdef __cplusplus
-extern "C" {
+//#ifdef __cplusplus
+extern "C" //{
 	void displayCallback();
-}
-#endif
+
+//#endif
 
 
 
@@ -19,7 +19,7 @@ class GLHandler {
 		
 	public:
 		GLHandler(LoadedObject *);
-		void initializeVBO(LoadedObject *);
+		static void initializeVBO(struct model *);
 		void renderObject(struct model *);
 		void displayFunction(void);
 		model *createModel(void);
@@ -28,11 +28,11 @@ class GLHandler {
 
 };
 
-GLHandler *currentInstance;
+//GLHandler *currentInstance;
 
-#ifdef __cplusplus
-}
+// #ifdef __cplusplus
+// }
 
-#endif
+// #endif
 
 #endif 

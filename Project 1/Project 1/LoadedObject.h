@@ -5,9 +5,6 @@
 
 class LoadedObject {
 	private:
-		model *obj;
-		vert *verts;
-		elem *elems;
 		int _vertCount, _elemCount;
 		int _verticeIndexCount, _elementIndexCount;
 		int _safetyCount; //To Make sure that we received all the Vertice and Triangles promised;
@@ -15,12 +12,17 @@ class LoadedObject {
 
 
 	public:
+		static vert *verts;
+		static elem *elems;
+		static model *obj;
 		LoadedObject();
 		void addVert(struct vert *);
 		void addElem(struct elem *);
 		model *getModel();
-		elem *getElems();
-		vert *getVerts();
+		static elem *getElems();
+		int getElemCount();
+		static vert *getVerts();
+		int getVertCount();
 		void printVert(struct vert *);
 		void printElem(struct elem *);
 		void setVertCount(int);
