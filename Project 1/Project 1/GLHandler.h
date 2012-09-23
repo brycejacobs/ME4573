@@ -30,5 +30,9 @@ class GLHandler {
 
 GLHandler *currentInstance;
 
+#ifdef __cplusplus
+}
+
+#endif
 
 #endif 

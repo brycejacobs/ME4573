@@ -31,18 +31,6 @@ int main(int argc, char *argv[]) {
 	return 0;
 }
 
-static void display(void) {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glTranslated(0.0, 0.0, -5.0);
-}
-
 static void resize(int w, int h) {
 	GLdouble x = 0.5 * (GLdouble) w / (GLdouble) h;
 	GLdouble y = 0.5;
