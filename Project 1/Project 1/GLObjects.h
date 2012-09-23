@@ -1,10 +1,10 @@
 #ifndef GLOBJECTS_H
 #define GLOBJECTS_H
 
-#include <Windows.h>
-#include <GL\glew.h>
-#include <GL\GL.h>
-#include <GL\glut.h>
+#include <GLUT/glut.h>
+#include <OpenGL/glu.h>
+#include <OpenGL/gl.h>
+
 
 struct model { 
 	GLuint vbo[1];

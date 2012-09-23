@@ -7,22 +7,16 @@
 
 class FileLoader {
 	private:
-		std::ifstream inFile;
+
 		LoadedObject *object;
-		std::string *fileName;
+		std::string fileName;
 
 
 	public:
-		FileLoader(LoadedObject *, std::string *);
-		boolean OpenFile(); //To perform error checking
-		void LoadFile(); //Actual File
-		
-
-
-
-
-
-
+		FileLoader(LoadedObject *, char *argv[]);
+		bool OpenFile(std::fstream &, char *argv[]); //To perform error checking
+		void getBits(std::fstream &);
+		void LoadFile(std::fstream &); //Actual File
 };
 
 
