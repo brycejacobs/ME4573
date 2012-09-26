@@ -1,26 +1,32 @@
 #ifndef LOADEDOBJECT_H
 #define LOADEDOBJECT_H
 
+#include <vector>
 #include "GLObjects.h"
+
 
 class LoadedObject {
 	private:
-		model *obj;
-		vert *verts;
-		elem *elems;
-		int _vertCount, _elemCount;
-		int _verticeIndexCount, _elementIndexCount;
-		int _safetyCount; //To Make sure that we received all the Vertice and Triangles promised;
-
-
+		std::vector<vert> verts;
+		std::vector<elem> elems;
 
 	public:
+
+
 		LoadedObject();
-		void addVert(struct vert *ourVert);
-		void addElem(struct elem *ourElem);
-		void setVertCount(int);
-		void setElemCount(int);
-		bool isSafe();
+		void addVert(vert *);
+		void addElem(elem *);
+		model *createModel();
+		const std::vector<elem> &getElems() const;
+		const std::vector<vert> &getVerts() const;
+		void initializeVBO(model *); 
+		void printVert(vert *);
+		void printElem(elem *);
+		void renderObject(model *obj);
+
+
+
+		
 };
 
 
