@@ -1,9 +1,15 @@
 #ifndef GLOBJECTS_H
 #define GLOBJECTS_H
 
-#include <GLUT/glut.h>
-#include <OpenGL/glu.h>
-#include <OpenGL/gl.h>
+#ifdef __APPLE__
+#	include <GLUT/glut.h>
+#	include <OpenGL/glu.h>
+#	include <OpenGL/gl.h>
+#else /// Includes for Windows
+#  include "GL/gl.h"
+#endif
+
+
 
 
 struct model { 
@@ -19,6 +25,7 @@ struct vert { // Our Vertice
 
 
 struct elem { //Our Triangles
+
 	GLuint i[3];
 };
 

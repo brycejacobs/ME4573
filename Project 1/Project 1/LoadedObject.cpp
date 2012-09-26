@@ -1,113 +1,111 @@
 #include <iostream>
+#include <assert.h>
 #include "LoadedObject.h"
 
-using std::cout;
-using std::endl;
+using namespace std;
 
 LoadedObject::LoadedObject() {
-	/* Initialize all Fields */
-	_vertCount = 0;
-	_elemCount = 0;
-
-
-	_verticeIndexCount = 0;
-	_elementIndexCount = 0;
-	_safetyCount = 0;
-
-	obj = new model;
 
 }
 
-void LoadedObject::addVert(struct vert *ourVert) {
-	if(isSafe(1)) {
-		cout << "Vertice Index: " << _verticeIndexCount << endl;
-		verts[_verticeIndexCount] = *ourVert;
-		_verticeIndexCount++;
-		_safetyCount++;
-		this->printVert(ourVert);
-	}
+void LoadedObject::addVert(vert *ourVert) {
+	verts.push_back(*ourVert);
+	printVert(ourVert);
+
 }
 
-void LoadedObject::addElem(struct elem *ourElem) {
-	if(isSafe(2)) {
-		cout << "Element Count: " << _elementIndexCount << endl;
-		elems[_elementIndexCount]  = *ourElem;
-		_elementIndexCount++;
-		_safetyCount++;
-		this->printElem(ourElem);
-	}
+void LoadedObject::addElem(elem *ourElem) {
+	elems.push_back(*ourElem);
+	printElem(ourElem);
 }
 
-model *LoadedObject::getModel() {
-	return this->obj;
-}
-elem *LoadedObject::getElems() {
-	return this->elems;
+model *LoadedObject::createModel() {
+	/* Create a new object */
+	model *modelobj;
+	modelobj = new model;
+
+	/* Generate our Buffers for the VBO */
+	glGenBuffers (1, modelobj->vbo);
+	glGenBuffers (1, modelobj->ebo);
+		
+	initializeVBO(modelobj);
+		
+	return modelobj;
 }
 
-int LoadedObject::getElemCount() {
-	return _elemCount;
-}
-vert *LoadedObject::getVerts() {
-	return this->verts;
+const vector<elem> &LoadedObject::getElems() const {
+	return elems;
 }
 
-int LoadedObject::getVertCount() {
-	return _vertCount;
+const vector<vert> &LoadedObject::getVerts() const{
+	return verts;
 }
 
-void LoadedObject::printVert(struct vert *ourVert) {
+void LoadedObject::initializeVBO(model *obj) {
+	std::cout << "Initializing VBO" << std::endl;
+	
+	glBindBuffer(GL_ARRAY_BUFFER, obj->vbo[0]);
+	glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(vert), verts.data(), GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj->ebo[0]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elems.size() * sizeof(elem)  , elems.data() , GL_STATIC_DRAW);
+
+}
+
+
+
+void LoadedObject::printVert(vert *ourVert) {
 	cout<< endl;
+	cout << "**********************************************************" << endl;
 	cout << "Vertice" << endl;
 	cout << "Vertice Values: " << ourVert->v[0] << " " << ourVert->v[1] << " " << ourVert->v[2] << endl;
 	cout << "Normal Values: " << ourVert->n[0] << " " <<  ourVert->n[1] << " " << ourVert->n[2] << endl;
+	cout << "**********************************************************" << endl;
 	cout << endl;
 }
 
-void LoadedObject::printElem(struct elem *ourElem) {
+void LoadedObject::printElem(elem *ourElem) {
 	cout<< endl;
+	cout << "**********************************************************" << endl;
 	cout << "Element" << endl;
 	cout << "Element Values: " << ourElem->i[0] << " " << ourElem->i[1] << " " << ourElem->i[2] << endl;
+	cout << "**********************************************************" << endl;
 	cout << endl; 
 }
 
+void LoadedObject::renderObject(model *obj) {
+	const size_t sz = sizeof(GLfloat);
 
-void LoadedObject::setVertCount(int num) {
-	_vertCount = num;
-	verts = new vert[num];
-	cout << "Vertice Size: " << num << endl;
-}
+	assert(obj);
 
-void LoadedObject::setElemCount(int num) {
-	_elemCount = num;
-	elems = new elem[num];
-	cout << "Elements Size: " << num << endl;
-}
+	//glDisableClientState(GL_COLOR_ARRAY);
+	//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
 
-bool LoadedObject::isSafe(int addCase) {
-	//ADDVERT = 1
-	//ADDELEM = 2
-	switch(addCase) {
-		case 1:
-			if(_verticeIndexCount == _vertCount) {
-				cout << "Refused ADD" << endl;
-				cout << "We have hit our promise amount for Vertice: " << _verticeIndexCount << endl;
-				return false;
-			}
-			return true;
-		case 2:
-			if(_elementIndexCount == _elemCount) { 
-				cout << "Refused ADD" << endl;
-				cout << "We have hit our promise amount for Elements: " << _elementIndexCount << endl;
-				return false;
-			}
-			return true;
-		default: 
-			cout << "LoadedObject::isSafe() - We shouldn't be here" << endl;
-			return false;
+	glColor4f(1.0f, 0.8f, 0.8f, 1.0f);
+	glBindBuffer(GL_ARRAY_BUFFER, obj->vbo[0]);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj->ebo[0]); 
+	{
+
+		glVertexPointer(3, GL_FLOAT, sizeof(vert), 0);
+		glNormalPointer(GL_FLOAT, sizeof(vert), (GLvoid *) (sz * 3));
+
+		glDrawElements(GL_TRIANGLES, elems.size() * 3  , GL_UNSIGNED_INT, 0);
 	}
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    
+    
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
+    
+    
 }
+
+
 
 
 

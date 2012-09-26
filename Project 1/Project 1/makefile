@@ -1,6 +1,6 @@
 CC= g++
 EXEC= render
-OBJS= main.o LoadedObject.o FileLoader.o GLHandler.o
+OBJS= main.o LoadedObject.o FileLoader.o 
 LIBS=  -L/opt/local/lib -lGLEW -framework GLUT -framework OpenGL
 
 $(EXEC) : $(OBJS)

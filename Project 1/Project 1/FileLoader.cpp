@@ -37,37 +37,46 @@ void FileLoader::getBits(fstream &inFile) {
 }
 
 void FileLoader::LoadFile(fstream &inFile) {
-	/* Find how many Vertice and Elements we will have */
-	int vertCount, elemCount;
 
-	inFile >> vertCount >> elemCount;
-
-	/* Let our LoadedObject Class know what we have found */
-	object->setVertCount(vertCount);
-	object->setElemCount(elemCount);
-
+	/* Create our Vertice and Element pointers to hold new Objects */
 	vert *v;
 	elem *e;
-	char *type;
+
+	char type;
+	int elemcount = 0; // For Refusing the last element before EOF is reached.
+
+	/* See how many Vertice and Triangles we are promised */
+	int vs, es;
+	inFile >> vs >> es;
+
 	/* Find each Vertice and Element */
 	while(!inFile.eof()) {
-		type = new char;
 		inFile >> type;
 
-		if(*type == 'v') {
+		if(type == 'v') {
 			v = new vert;
-			inFile >> v->v[0] >> v->v[1] >> v->v[2];
-			inFile >> v->n[0] >> v->n[1] >> v->n[2];
 
+			/* Read in the full Vertice */
+			inFile >> v->v[0] >> v->v[1] >> v->v[2] >> v->n[0] >> v->n[1] >> v->n[2];
+			
 			object->addVert(v);
-			this->getBits(inFile);
-		} else {
-			e = new elem;
-			inFile >> e->i[0] >> e->i[1] >> e->i[2];
 
-			object->addElem(e);
-			this->getBits(inFile);
+		} else if( type == 't' ) {
+			if(elemcount < es) {
+				e = new elem;
+				
+				/* Read in the full Element */
+				inFile >> e->i[0] >> e->i[1] >> e->i[2];
+
+				object->addElem(e);
+				elemcount ++;
+			}
+
 		}
+
 	}
+	std::cout << "VERTCOUNT: " << vs << std::endl;
+	std::cout << "ELEMCOUNT: " << es << std::endl;
 	inFile.close();
+
 }

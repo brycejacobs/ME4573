@@ -1,7 +1,7 @@
 #ifndef GLHANDLER_H
 #define GLHANDLER_H
 
-#include "LoadedObject.h"
+//#include "LoadedObject.h"
 
 
 //#ifdef __cplusplus
@@ -19,7 +19,7 @@ class GLHandler {
 		
 	public:
 		GLHandler(LoadedObject *);
-		static void initializeVBO(struct model *);
+		//static void initializeVBO(struct model *);
 		void renderObject(struct model *);
 		void displayFunction(void);
 		model *createModel(void);

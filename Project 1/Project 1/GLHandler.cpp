@@ -9,17 +9,17 @@ GLHandler::GLHandler(LoadedObject *obj) {
 	this->object = obj;
 }
 
-void GLHandler::initializeVBO(struct model *obj) {
-	std::cout << "Initializing VBO" << std::endl;
-	//std::cout << *object->obj->vbo[0] << std::endl;
-	glBindBuffer(GL_ARRAY_BUFFER, obj->vbo[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(LoadedObject::getVerts()), LoadedObject::getVerts(), GL_STATIC_DRAW);
+// void GLHandler::initializeVBO(struct model *obj) {
+// 	std::cout << "Initializing VBO" << std::endl;
+// 	//std::cout << *object->obj->vbo[0] << std::endl;
+// 	glBindBuffer(GL_ARRAY_BUFFER, obj->vbo[0]);
+// 	//glBufferData(GL_ARRAY_BUFFER, sizeof(LoadedObject::getVerts()), LoadedObject::getVerts(), GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj->ebo[0]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(LoadedObject::getElems()), LoadedObject::getElems(), GL_STATIC_DRAW);
+// 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj->ebo[0]);
+// 	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(LoadedObject::getElems()), LoadedObject::getElems(), GL_STATIC_DRAW);
 
-	std::cout << "DIDNT MAKE IT TOO FAR" << std::endl;
-}
+// 	std::cout << "DIDNT MAKE IT TOO FAR" << std::endl;
+// }
 
 void GLHandler::renderObject(struct model *obj) {
 	const size_t sz = sizeof(GLfloat);
