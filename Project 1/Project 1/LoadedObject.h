@@ -12,8 +12,6 @@ class LoadedObject {
 
 	public:
 
-
-		LoadedObject();
 		void addVert(vert *);
 		void addElem(elem *);
 		model *createModel();
