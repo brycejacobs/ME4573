@@ -60,11 +60,14 @@ int main(int argc, char *argv[]) {
    	glutInit(&argc, argv);
 	glutCreateWindow(argv[0]);
 
+	if(glewInit() == GLEW_OK) {
 	startup();
+ 	glutMainLoop();
+	}
 
     glutReshapeFunc(resize);
     glutDisplayFunc(displayFunction);
- 	glutMainLoop();
+	
     
 
 	return 0;

@@ -5,6 +5,8 @@
 #include "GLObjects.h"
 
 
+
+
 class LoadedObject {
 	private:
 		std::vector<vert> verts;

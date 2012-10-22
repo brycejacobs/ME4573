@@ -6,7 +6,12 @@
 #	include <OpenGL/glu.h>
 #	include <OpenGL/gl.h>
 #else /// Includes for Windows
-#  include "GL/gl.h"
+
+//#include <Windows.h>
+#define GLEW_STATIC
+#include <GL/glew.h>
+#include <GL/GL.h>
+#include <GL/freeglut.h>
 #endif
 
 
