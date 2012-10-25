@@ -1,16 +1,81 @@
-﻿Build started 10/22/2012 4:00:25 AM.
+﻿Build started 10/25/2012 4:07:49 AM.
      1>Project "C:\Users\Pop\Documents\Development\Classes\ME4573\Project 2\Project 2\Project 2.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp phongfragment.glsl
+         phongfragment.glsl
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(1): error C2146: syntax error : missing ';' before identifier 'vec3'
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(1): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(1): error C2146: syntax error : missing ';' before identifier 'N'
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(2): error C2146: syntax error : missing ';' before identifier 'vec3'
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(2): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(2): error C2086: 'int varying' : redefinition
+                 c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(1) : see declaration of 'varying'
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(2): error C2146: syntax error : missing ';' before identifier 'v'
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(2): error C2086: 'int vec3' : redefinition
+                 c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(1) : see declaration of 'vec3'
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(6): error C2146: syntax error : missing ';' before identifier 'L'
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(6): error C2065: 'L' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(6): error C2065: 'gl_LightSource' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(6): error C2228: left of '.position' must have class/struct/union
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(6): error C2228: left of '.xyz' must have class/struct/union
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(6): error C3861: 'normalize': identifier not found
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(7): error C2146: syntax error : missing ';' before identifier 'E'
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(7): error C2065: 'E' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(7): error C3861: 'normalize': identifier not found
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(8): error C2146: syntax error : missing ';' before identifier 'R'
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(8): error C2065: 'R' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(8): error C2065: 'L' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(8): error C3861: 'normalize': identifier not found
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(8): error C3861: 'reflect': identifier not found
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(11): error C2065: 'vec4' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(11): error C2146: syntax error : missing ';' before identifier 'Iamb'
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(11): error C2065: 'Iamb' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(11): error C2065: 'gl_FrontLightProduct' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(11): error C2228: left of '.ambient' must have class/struct/union
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(14): error C2065: 'vec4' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(14): error C2146: syntax error : missing ';' before identifier 'Idiff'
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(14): error C2065: 'Idiff' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(14): error C2065: 'gl_FrontLightProduct' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(14): error C2228: left of '.diffuse' must have class/struct/union
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(14): error C2065: 'L' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(14): error C3861: 'max': identifier not found
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(14): error C3861: 'dot': identifier not found
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(15): error C2065: 'Idiff' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(15): error C3861: 'clamp': identifier not found
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(18): error C2065: 'vec4' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(18): error C2146: syntax error : missing ';' before identifier 'Ispec'
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(18): error C2065: 'Ispec' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(18): error C2065: 'gl_FrontLightProduct' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(19): error C2228: left of '.specular' must have class/struct/union
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(19): error C2065: 'R' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(19): error C2065: 'E' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(19): error C2065: 'gl_FrontMaterial' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(19): error C2228: left of '.shininess' must have class/struct/union
+                 type is ''unknown-type''
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(19): error C3861: 'pow': identifier not found
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(19): error C3861: 'max': identifier not found
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(19): error C3861: 'dot': identifier not found
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(20): error C2065: 'Ispec' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(20): error C3861: 'clamp': identifier not found
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(22): error C2065: 'gl_FragColor' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(22): error C2065: 'gl_FrontLightModelProduct' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(22): error C2228: left of '.sceneColor' must have class/struct/union
+                 type is ''unknown-type''
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(22): error C2065: 'Iamb' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(22): error C2065: 'Idiff' : undeclared identifier
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\phongfragment.glsl(22): error C2065: 'Ispec' : undeclared identifier
          main.cpp
-       Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Pop\Documents\Development\Classes\ME4573\Project 2\Debug\Project 2.exe" /INCREMENTAL /NOLOGO glew32.lib freeglut.lib libjpeg.lib libpng.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Pop\Documents\Development\Classes\ME4573\Project 2\Debug\Project 2.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Pop\Documents\Development\Classes\ME4573\Project 2\Debug\Project 2.lib" /MACHINE:X86 Debug\image.obj
-         Debug\main.obj
-         Debug\obj.obj
-         Debug\plane.obj
-         Project 2.vcxproj -> C:\Users\Pop\Documents\Development\Classes\ME4573\Project 2\Debug\Project 2.exe
-     1>Done Building Project "C:\Users\Pop\Documents\Development\Classes\ME4573\Project 2\Project 2\Project 2.vcxproj" (Build target(s)).
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\shaderloader.h(19): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 11.0\vc\include\stdio.h(218) : see declaration of 'fopen'
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\main.cpp(49): warning C4305: 'initializing' : truncation from 'double' to 'GLfloat'
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\main.cpp(344): warning C4305: '=' : truncation from 'double' to 'GLfloat'
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\main.cpp(351): warning C4244: '=' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\main.cpp(352): warning C4244: '=' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\main.cpp(374): warning C4244: '=' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\main.cpp(375): warning C4244: '=' : conversion from 'double' to 'GLfloat', possible loss of data
+         Generating Code...
+     1>Done Building Project "C:\Users\Pop\Documents\Development\Classes\ME4573\Project 2\Project 2\Project 2.vcxproj" (Build target(s)) -- FAILED.
 
-Build succeeded.
+Build FAILED.
 
-Time Elapsed 00:00:01.62
+Time Elapsed 00:00:01.45

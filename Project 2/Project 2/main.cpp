@@ -1,59 +1,83 @@
 #include <iostream>
 #include <math.h>
 #include "gl.h"
-#include "key.h"
+#include "shaderloader.h"
 #include "obj.h"
 #include "plane.h"
+#include "image.h"
+
 
 /* Method Prototypes */
 void display();
 void initialize();
-void keyboard(unsigned char key, int x, int y);
-void keyboardup(unsigned char key, int x, int y);
-void motion(int x, int y);
-void mouse(int button, int state, int x, int y);
-void point(int x, int y);
-void reshape(int w, int h);
-void spotlight();
+void keyboard(unsigned char, int, int);
+void keyboardup(unsigned char, int, int);
+void motion(int, int);
+void mouse(int, int, int, int);
+void reshape(int, int);
+
+/*Protypes for Camera */
+static void camera_fly();
+static void pan_camera(GLfloat, GLfloat);
+static void zoom_camera(GLfloat);
+
+/* Prototypes for light */
+static void pan_light(GLfloat, GLfloat);
+static void lights();
+
+/* Prototypes for the menu */
+void processItem1(int);
+void processItem2(int);
+void processMain(int);
+void createMenuItems();
+
+/* Fragment and Vertex Prototypes */
+void CreatePhong();
+
+
 
 /* All of our Global Variables */
-int last_time;
 
-GLdouble distance_near;
-GLdouble distance_far;
+GLfloat controlTheTroll[3] = {0.0, 0.0, 0.0}; //Variables for troll position
 
-GLdouble zoom;
-GLdouble rotation_x;
-GLdouble rotation_y;
-GLdouble position_x;
-GLdouble position_y;
-GLdouble position_z;
 
-GLdouble keyboard_dx;
-GLdouble keyboard_dy;
-GLdouble keyboard_dz;
+/* Camera Variables */
+static int      last_time;
 
-GLdouble pointer_vx;
-GLdouble pointer_vy;
-GLdouble pointer_vz;
+/* Camera state.                                                              */
 
-int click_button;
-GLdouble click_zoom;
-GLdouble click_rotation_x;
-GLdouble click_rotation_y;
-GLdouble click_nx;
-GLdouble click_ny;
+static GLfloat  position[4] = {   0.0,  0.0,  5.0,  1.0 };
+static GLfloat  rotation[2] = {   11.3,  10.0             };
+static GLfloat  light[2]    = { -60.0, 30.0             };
+static GLfloat  point[4]    = {   0.0,  0.0,  0.0,  0.0 };
+static GLfloat  zoom        = 0.5;
 
-GLboolean animating;                                                           
-GLdouble  rotation;  
+/* Camera state at the beginning of a click.                                  */
 
-float g_lightPos[4] = { 10, 10, -100, 1 };
+static int      click_modifiers;
+static int      click_button = -1;
+static int      click_x;
+static int      click_y;
+static GLfloat  click_rotation[2];
+static GLfloat  click_light[2];
+static GLfloat  click_zoom;
 
+/* Definitions for constants regarding to the menu */
+#define FIRSTFRAGMENT 1
+#define SECONDFRAGMENT 2
+#define THIRDFRAGMENT 3
+
+#define FIRSTVERTEX 1
+#define SECONDVERTEX 2
+#define THIRDVERTEX 3
+
+/* Menu openGL objects */
+int vertexMenu, fragmentMenu, mainMenu;
 
 plane *P;
 obj *shuttle;
 obj	*jet;
-obj *helicopter;
+obj *troll;
 
 int main(int argc, char **argv) {
 
@@ -72,6 +96,8 @@ int main(int argc, char **argv) {
 	glutMotionFunc(motion);
 	glutMouseFunc(mouse);
 
+
+
 	if(glewInit() == GLEW_OK) {
 		std::cout << "GLEW_OK" << std::endl;
 		initialize();
@@ -89,40 +115,47 @@ int main(int argc, char **argv) {
 /* The display Function glutDisplayFunc() will use*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void display() {
-	GLdouble tb = zoom;
-    GLdouble lr = zoom * glutGet(GLUT_WINDOW_WIDTH)
-                       / glutGet(GLUT_WINDOW_HEIGHT);
+
+	GLfloat V = 0.1f * zoom;
+    GLfloat H = 0.1f * zoom * glutGet(GLUT_WINDOW_WIDTH)
+                            / glutGet(GLUT_WINDOW_HEIGHT);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glFrustum(-lr, lr, -tb, tb, distance_near, distance_far);
-    
+
+    glFrustum(-H, H, -V, V, 0.1, 100.0);
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-	glTranslatef(0, 0, -10); 
-    spotlight();
 
-    glRotated(rotation_x, 1.0, 0.0, 0.0);
-    glRotated(rotation_y, 0.0, 1.0, 0.0);
-    glTranslated(-position_x, -position_y, -position_z);
-	glLightfv(GL_LIGHT0, GL_POSITION, g_lightPos);
+	lights();
+	camera_fly();
+
+	glTranslatef(0, 0, -10); 
+
+	
     glPushMatrix();                                                            
     {   
 		glDisable(GL_LIGHTING);
         plane_render(P);  
-        glTranslated(0.0, 1.0, 0.0);                                           
-        //glRotated(rotation, 0.0, 1.0, 0.0);  
+		glEnable(GL_LIGHTING);                                                        
+    }  
+	glPopMatrix(); 
 
-		
-		obj_render(shuttle);
-		//obj_mini(shuttle);
-		obj_proc(shuttle);
-		//obj_norm(shuttle);
-        glEnable(GL_LIGHTING);                                                        
-    }                                                                          
-    glPopMatrix();                                                             
+	                                         
+	//This is so we can control the troll only.
+	glPushMatrix(); 
+	{
+		glTranslated(controlTheTroll[0], 1.0, controlTheTroll[2]);  
+		obj_render(troll);
+	}
+	glPopMatrix();
+
+	glTranslated(0.0, 1.0, 0.0);
+	obj_render(jet);
+                                                                
     
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glutSwapBuffers();
@@ -134,35 +167,22 @@ void display() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void initialize() {
 	last_time   = 0;
-
-    distance_near =   1.0;
-    distance_far  = 100.0;
-
     zoom        = 0.5;
-    rotation_x  = 0.0;
-    rotation_y  = 0.0;
 
-    position_x  = 0.0;
-    position_y  = 2.0;
-    position_z  = 5.0;
-    
-    keyboard_dx = 0.0;
-    keyboard_dy = 0.0;
-    keyboard_dz = 0.0;
-    
-    animating = GL_FALSE;                                                      
-    rotation  = 0.0;                                                           
-    
-    P = plane_create(20);
-	shuttle = obj_create("NASA_SHUTTLE.obj");
+    P = plane_create(60);
+	//shuttle = obj_create("trolluvd1.obj");
 	//helicopter = obj_create("helicopter");
-	//jet = obj_create("jet");
+	jet = obj_create("jet.obj");
+	troll = obj_create("trolluvd1.obj");
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     
     glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+
+	createMenuItems();
+	
 
 
 }
@@ -174,13 +194,38 @@ void keyboard(unsigned char key, int x, int y)
 {
     switch (key)
     {
-        case KEY_L: keyboard_dx -= 1.0; break;
-        case KEY_R: keyboard_dx += 1.0; break;
-        case KEY_D: keyboard_dy -= 1.0; break;
-        case KEY_U: keyboard_dy += 1.0; break;
-        case KEY_F: keyboard_dz -= 1.0; break;
-        case KEY_B: keyboard_dz += 1.0; break;
+        case 'a':      
+			position[0] -= 1.0;
+			break;
+        case 'd': 
+			position[0] += 1.0;
+			break;
+        case 'c': 
+			position[1] -= 1.0; 
+			break;
+        case ' ':
+			position[1] += 1.0;
+			break;
+        case 'w':
+			position[2] -= 1.0;
+			break;
+        case 's': 
+			position[2] += 1.0;
+			break;
+		case 'i':
+			controlTheTroll[2] += 1.0;
+			break;
+		case 'k':
+			controlTheTroll[2] -= 1.0;
+		case 'j':
+			controlTheTroll[0] += 1.0;
+			break;
+		case 'l': 
+			controlTheTroll[0] -= 1.0;
+			break;
+
     }
+	glutPostRedisplay();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -189,13 +234,39 @@ void keyboard(unsigned char key, int x, int y)
 void keyboardup(unsigned char key, int x, int y) {
     switch (key)
     {
-        case KEY_L: keyboard_dx += 1.0; break;
-        case KEY_R: keyboard_dx -= 1.0; break;
-        case KEY_D: keyboard_dy += 1.0; break;
-        case KEY_U: keyboard_dy -= 1.0; break;
-        case KEY_F: keyboard_dz += 1.0; break;
-        case KEY_B: keyboard_dz -= 1.0; break;
+        case 'a':      
+			position[0] -= 1.0;
+			break;
+        case 'd': 
+			position[0] += 1.0;
+			break;
+        case 'c': 
+			position[1] -= 1.0; 
+			break;
+        case ' ':
+			position[1] += 1.0;
+			break;
+        case 'w':
+			position[2] -= 1.0;
+			break;
+        case 's': 
+			position[2] += 1.0;
+			break;
+		case 'i':
+			controlTheTroll[2] += 1.0;
+			break;
+		case 'k':
+			controlTheTroll[2] -= 1.0;
+		case 'j':
+			controlTheTroll[0] += 1.0;
+			break;
+		case 'l': 
+			controlTheTroll[0] -= 1.0;
+			break;
+
+
     }
+	glutPostRedisplay();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -203,29 +274,38 @@ void keyboardup(unsigned char key, int x, int y) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void motion(int x, int y)
 {
-	GLdouble nx = (GLdouble) x / glutGet(GLUT_WINDOW_WIDTH);
-    GLdouble ny = (GLdouble) y / glutGet(GLUT_WINDOW_HEIGHT);
+    const int w = glutGet(GLUT_WINDOW_WIDTH);
+    const int h = glutGet(GLUT_WINDOW_HEIGHT);
 
-    GLdouble dx = nx - click_nx;
-    GLdouble dy = ny - click_ny;
+    GLfloat H = .1f * zoom * w / h;
+    GLfloat V = .1f * zoom;
+    GLfloat r;
 
-    if (click_button == GLUT_LEFT_BUTTON)                                      \
-    {                                                                          \
-        rotation_x = click_rotation_x +  90.0 * dy * zoom;                     \
-        rotation_y = click_rotation_y + 180.0 * dx * zoom;                     \
-                                                                               \
-        if (rotation_x >   90.0) rotation_x  =  90.0;                          \
-        if (rotation_x <  -90.0) rotation_x  = -90.0;                          \
-        if (rotation_y >  180.0) rotation_y -= 360.0;                          \
-        if (rotation_y < -180.0) rotation_y += 360.0;                          \
-    }                                                                          \
-    if (click_button == GLUT_RIGHT_BUTTON)                                     \
-    {                                                                          \
-        zoom = click_zoom + dy;                                                \
-                                                                               \
-        if (zoom < 0.01) zoom = 0.01;                                          \
-    }                                                                          \
-    glutPostRedisplay();
+    /* Compute the pointer motion as a fraction of window size. */
+
+    GLfloat dx = (GLfloat) (x - click_x) / w;
+    GLfloat dy = (GLfloat) (y - click_y) / h;
+
+    /* Apply the pointer motion to the camera or light. */
+
+	if (click_button == GLUT_LEFT_BUTTON)
+    {
+        if      (click_modifiers == 0)                  pan_camera(dx, dy);
+		else if (click_modifiers == GLUT_ACTIVE_CTRL)   pan_light (dx, dy);
+        else if (click_modifiers == GLUT_ACTIVE_SHIFT) zoom_camera(    dy);
+    }
+
+    /* Compute the eye-space pointer vector. */
+    point[0] =  (2.0f * x / w - 1.0f) * H;
+    point[1] = -(2.0f * y / h - 1.0f) * V;
+    point[2] = -(0.1f);
+    r = 1.0f / (GLfloat) sqrt(point[0] * point[0] +
+                              point[1] * point[1] +
+                              point[2] * point[2]);
+    point[0] *= r;
+    point[1] *= r;
+    point[2] *= r;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -233,36 +313,21 @@ void motion(int x, int y)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void mouse(int button, int state, int x, int y)
 {
-    click_nx = (GLdouble) x / glutGet(GLUT_WINDOW_WIDTH);
-    click_ny = (GLdouble) y / glutGet(GLUT_WINDOW_HEIGHT);
+    /* Note all camera state at the beginning of a click. */
 
-    click_button     = button;                                                 \
-    click_zoom       = zoom;                                                   \
-    click_rotation_x = rotation_x;
-    click_rotation_y = rotation_y;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/* The point function used in the motion function */
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void point(int x, int y)
-{
-    GLdouble tb = zoom;
-    GLdouble lr = zoom * glutGet(GLUT_WINDOW_WIDTH)
-                       / glutGet(GLUT_WINDOW_HEIGHT);
-    GLdouble k;
-
-    pointer_vx =  (2.0 * x / glutGet(GLUT_WINDOW_WIDTH)  - 1.0) * lr;
-    pointer_vy = -(2.0 * y / glutGet(GLUT_WINDOW_HEIGHT) - 1.0) * tb;
-    pointer_vz = -distance_near;
-
-    k = sqrt(pointer_vx * pointer_vx +
-             pointer_vy * pointer_vy +
-             pointer_vz * pointer_vz);
-
-    pointer_vx /= k;
-    pointer_vy /= k;
-    pointer_vz /= k;
+    if (state == GLUT_DOWN)
+    {
+        click_modifiers   = glutGetModifiers();
+        click_button      = button;
+        click_x           = x;
+        click_y           = y;
+        click_zoom        = zoom;
+        click_rotation[0] = rotation[0];
+        click_rotation[1] = rotation[1];
+        click_light[0]    = light[0];
+        click_light[1]    = light[1];
+    }
+    else click_button = -1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -272,21 +337,162 @@ void reshape(int w, int h) {
 	glViewport(0, 0, w, h);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/* Function to make a spotlight, used in main() */
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void spotlight() {
-    GLfloat v[4], p[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
-    v[0] = (GLfloat) pointer_vx;
-    v[1] = (GLfloat) pointer_vy;
-    v[2] = (GLfloat) pointer_vz;
-    v[3] = (GLfloat) 1.0;
+static void zoom_camera(GLfloat dy)
+{
+    zoom = click_zoom + dy;
 
-    glLightfv(GL_LIGHT0, GL_POSITION,       p);
-    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, v);
-    glLightf (GL_LIGHT0, GL_SPOT_CUTOFF,   40);
-    glLightf (GL_LIGHT0, GL_SPOT_EXPONENT, 64);
+    if (zoom < 0.01) zoom = 0.01;
+
+    glutPostRedisplay();
+}
+
+static void pan_camera(GLfloat dx, GLfloat dy)
+{
+    rotation[0] = click_rotation[0] +  90.0 * dy * zoom;
+    rotation[1] = click_rotation[1] + 180.0 * dx * zoom;
+
+    if (rotation[0] >   90.0) rotation[0]  =  90.0;
+    if (rotation[0] <  -90.0) rotation[0]  = -90.0;
+    if (rotation[1] >  180.0) rotation[1] -= 360.0;
+    if (rotation[1] < -180.0) rotation[1] += 360.0;
+
+    glutPostRedisplay();
+}
+
+static void camera_fly()
+{
+	std::cout  << "Camera_FLY CALLED with Rotation 1 and 2 as " << rotation[0] << " " << rotation[1] << std::endl;
+    glRotatef(rotation[0], 1.0f, 0.0f, 0.0f);
+    glRotatef(rotation[1], 0.0f, 1.0f, 0.0f);
+
+	std::cout << "Will be translating pos 1 2 3: " << position[0] << " " << position[1] << " " << position[2] << std::endl;
+    glTranslatef(-position[0], -position[1], -position[2]);
+}
+
+static void pan_light(GLfloat dx, GLfloat dy)
+{
+    light[0] = click_light[0] +  90.0 * dy;
+    light[1] = click_light[1] + 180.0 * dx;
+
+    if (light[0] >   90.0) light[0]  =  90.0;
+    if (light[0] <  -90.0) light[0]  = -90.0;
+    if (light[1] >  180.0) light[1] -= 360.0;
+    if (light[1] < -180.0) light[1] += 360.0;
+
+    glutPostRedisplay();
+}
+
+static void lights()
+{
+    /* Position the global light. */
+
+    const GLfloat L[4] = { 0.0f, 0.0f, 1.0f, 0.0f };
+
+    glPushMatrix();
+    {
+        glRotatef(light[1], 0.0f, 1.0f, 0.0f);
+        glRotatef(light[0], 1.0f, 0.0f, 0.0f);
+        glLightfv(GL_LIGHT0, GL_POSITION, L);
+    }
+    glPopMatrix();
+
+    /* Position the flashlight. */
+
+    glLightfv(GL_LIGHT1, GL_POSITION, point);
+}
+
+/////////////////////////////////////////////////////////////////////
+//This will create all of our items for the menu.
+////////////////////////////////////////////////////////////////////
+void createMenuItems(){
+
+	fragmentMenu = glutCreateMenu(processItem1);
+	{
+		glutAddMenuEntry("Brick Fragment Program", FIRSTFRAGMENT);
+		glutAddMenuEntry("Second Fragment Program", SECONDFRAGMENT);
+		glutAddMenuEntry("Third Fragment Program", THIRDFRAGMENT);
+	}
+
+	vertexMenu = glutCreateMenu(processItem2);
+	{
+		glutAddMenuEntry("Wave Vertex Program", FIRSTVERTEX);
+		glutAddMenuEntry("Second Vertext Program", SECONDVERTEX);
+		glutAddMenuEntry("Third Vertext Program", THIRDVERTEX);
+	}
+
+	mainMenu = glutCreateMenu(processMain);
+	{
+		glutAddSubMenu("Toggle Vertex Programs", vertexMenu);
+		glutAddSubMenu("Toggle Fragment Programs", fragmentMenu);
+	}
+
+	glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
+void processItem1(int option) {
+	
+	switch (option) {
+		case FIRSTFRAGMENT:
+			CreatePhong();
+
+			break;
+		case SECONDFRAGMENT:
+			
+			break;
+		case THIRDFRAGMENT :
+			break;
+	}
+}
+
+void processItem2(int option) {
+	switch(option) {
+	case FIRSTVERTEX:
+
+		break;
+	case SECONDVERTEX:
+
+		break;
+
+	case THIRDVERTEX:
+
+		break;
+
+
+	}
+
+}
+ //Empt method
+void processMain(int option) {}
+
+void CreatePhong() {
+	ShaderLoader *loader;
+	loader = new ShaderLoader();
+	GLuint phong_program = glCreateProgram();
+
+	//Phong shader
+	GLuint phong_vertex = glCreateShader(GL_VERTEX_SHADER);
+
+	GLchar *phong_vertext_text = loader->load("phongvertex.glsl"); 
+	glShaderSource(phong_vertex, 1, (const GLchar **) &phong_vertext_text, 0);
+	glCompileShader(phong_vertex);
+	free(phong_vertext_text);
+
+	GLuint phong_fragment = glCreateShader(GL_FRAGMENT_SHADER);
+
+	GLchar *phong_fragment_text = loader->load("phongfragment.glsl");
+	glShaderSource(phong_fragment, 1, (const GLchar**) &phong_fragment_text, 0);
+	glCompileShader(phong_fragment);
+	free(phong_fragment_text);
+
+			
+
+	glAttachShader(phong_program, phong_vertex);
+	glAttachShader(phong_program, phong_fragment);
+
+	glLinkProgram(phong_program);
+
+	glUseProgram(phong_program);
 }
 
 

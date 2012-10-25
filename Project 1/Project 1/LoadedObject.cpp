@@ -4,9 +4,9 @@
 
 using namespace std;
 
-LoadedObject::LoadedObject() {
-
-}
+/* Global Variables for Specular and Diffuse */
+GLfloat whiteSpecularLight[] = {1.0, 1.0, 1.0};
+GLfloat whiteDiffuseLight[] = {1.0, 1.0, 1.0};
 
 void LoadedObject::addVert(vert *ourVert) {
 	verts.push_back(*ourVert);
@@ -49,7 +49,6 @@ void LoadedObject::initializeVBO(model *obj) {
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj->ebo[0]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elems.size() * sizeof(elem)  , elems.data() , GL_STATIC_DRAW);
-
 }
 
 
@@ -78,13 +77,13 @@ void LoadedObject::renderObject(model *obj) {
 
 	assert(obj);
 
-	//glDisableClientState(GL_COLOR_ARRAY);
-	//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
+	glColor3f(0.0f, 0.0f, 0.0f);
 
-	glColor4f(1.0f, 0.8f, 0.8f, 1.0f);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, whiteSpecularLight); 
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, whiteDiffuseLight);
+	
 	glBindBuffer(GL_ARRAY_BUFFER, obj->vbo[0]);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj->ebo[0]); 
 	{
@@ -104,6 +103,8 @@ void LoadedObject::renderObject(model *obj) {
     
     
 }
+
+
 
 
 

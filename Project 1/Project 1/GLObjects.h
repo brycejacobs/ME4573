@@ -34,6 +34,12 @@ struct elem { //Our Triangles
 	GLuint i[3];
 };
 
+struct planeobject {
+	GLuint  vbo[1];
+    GLuint  ebo[2];
+   	GLsizei n;
+};
+
 
 
 
