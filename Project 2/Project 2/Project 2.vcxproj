@@ -87,10 +87,8 @@
     <ClCompile Include="image.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="obj.c" />
-    <ClCompile Include="phongvertex.glsl" />
     <ClCompile Include="plane.c" />
-    <ClCompile Include="phongfragment.glsl" />
-    <ClCompile Include="waveglsl" />
+    <ClCompile Include="shaderloader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gl.h" />
@@ -100,7 +98,15 @@
     <ClInclude Include="shaderloader.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="brick.glsl" />
+    <None Include="brick_fragment.glsl" />
+    <None Include="brick_vertex.glsl" />
+    <None Include="colors_animation_fragment.glsl" />
+    <None Include="flatten_fragment.glsl" />
+    <None Include="flatten_vertex.glsl" />
+    <None Include="wave_vertex.glsl" />
+    <None Include="toon_fragment.glsl" />
+    <None Include="toon_vertex.glsl" />
+    <None Include="wave_fragment.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

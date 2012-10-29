@@ -1,5 +1,7 @@
 #include <iostream>
 #include <math.h>
+#include <vector>
+#include <time.h>
 #include "gl.h"
 #include "shaderloader.h"
 #include "obj.h"
@@ -7,9 +9,11 @@
 #include "image.h"
 
 
+	
 /* Method Prototypes */
 void display();
 void initialize();
+void idle();
 void keyboard(unsigned char, int, int);
 void keyboardup(unsigned char, int, int);
 void motion(int, int);
@@ -28,21 +32,23 @@ static void lights();
 /* Prototypes for the menu */
 void processItem1(int);
 void processItem2(int);
+void processReset(int);
 void processMain(int);
 void createMenuItems();
 
 /* Fragment and Vertex Prototypes */
-void CreatePhong();
+GLuint createProgram();
+bool checkCompilationStatus(GLuint);
+bool checkLinkingStatus(GLuint);
+
+void Wait(int);
 
 
-
-/* All of our Global Variables */
-
-GLfloat controlTheTroll[3] = {0.0, 0.0, 0.0}; //Variables for troll position
-
+/* Variables for model Rendering */
+static int scenario = 1;
 
 /* Camera Variables */
-static int      last_time;
+static int last_time;
 
 /* Camera state.                                                              */
 
@@ -62,22 +68,61 @@ static GLfloat  click_rotation[2];
 static GLfloat  click_light[2];
 static GLfloat  click_zoom;
 
-/* Definitions for constants regarding to the menu */
-#define FIRSTFRAGMENT 1
-#define SECONDFRAGMENT 2
-#define THIRDFRAGMENT 3
+/* Shader Variables */
+std::vector <GLuint> fragments;
+std::vector <GLuint> vertexs;
 
-#define FIRSTVERTEX 1
-#define SECONDVERTEX 2
-#define THIRDVERTEX 3
+std::vector<char *> fragmentNames;
+std::vector<char *> vertexNames;
+
+GLuint brickprogram;
+GLuint waveprogram;
+GLuint toonprogram;
+GLuint animationprogram;
+GLuint flattenprogram;
+
+float timeFactor;
+float timeFrequency = 0.2;
+float addedTime = 0.3;
+float brickColorChanger = 0.2;
+clock_t initial = clock();
+bool wave = false;
+bool colors_animation = false;
+bool flattened = false;
+
+bool enabledPlane = true;
+
+
+
+/* Definitions for constants regarding to the menu */
+#define FIRSTOPTION 1
+#define SECONDOPTION 2
+#define THIRDOPTION 3
+#define FOURTHOPTION 4
+#define FIFTHOPTION 5
+
+#define FIRSTMODEL 1
+#define SECONDMODEL 2
+#define THIRDMODEL 3
+#define FOURTHMODEL 4
+#define FIFTHMODEL 5
+
+#define JET 1
+#define TROLL 2
+#define HELICOPTER 3
+#define NONE 4
 
 /* Menu openGL objects */
-int vertexMenu, fragmentMenu, mainMenu;
+int shaderMenu, modelMenu, resetMenu, mainMenu;
 
 plane *P;
-obj *shuttle;
+obj *helicopter;
 obj	*jet;
 obj *troll;
+
+using std::vector;
+using std::cout;
+using std::endl;
 
 int main(int argc, char **argv) {
 
@@ -95,6 +140,7 @@ int main(int argc, char **argv) {
     glutDisplayFunc(display);
 	glutMotionFunc(motion);
 	glutMouseFunc(mouse);
+	glutIdleFunc(idle);
 
 
 
@@ -135,30 +181,39 @@ void display() {
 
 	glTranslatef(0, 0, -10); 
 
-	
     glPushMatrix();                                                            
     {   
-		glDisable(GL_LIGHTING);
-        plane_render(P);  
-		glEnable(GL_LIGHTING);                                                        
+		if(enabledPlane) {
+			glDisable(GL_LIGHTING);
+			plane_render(P);  
+			glEnable(GL_LIGHTING);    
+		}
     }  
 	glPopMatrix(); 
 
 	                                         
-	//This is so we can control the troll only.
-	glPushMatrix(); 
-	{
-		glTranslated(controlTheTroll[0], 1.0, controlTheTroll[2]);  
-		obj_render(troll);
-	}
-	glPopMatrix();
 
 	glTranslated(0.0, 1.0, 0.0);
-	obj_render(jet);
-                                                                
-    
+
+	switch(scenario) {
+	case JET:
+		obj_render(jet);
+		break;
+	case TROLL:
+		obj_render(troll);
+		break;
+	case HELICOPTER:
+		obj_render(helicopter);
+		break;
+	case NONE:
+		break;
+	default:
+		cout << "Shouldn't be here bud...GET OUT!!! 1" << endl;
+		break;
+	}
+
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-    glutSwapBuffers();
+	glutSwapBuffers();
 
 }
 
@@ -170,10 +225,9 @@ void initialize() {
     zoom        = 0.5;
 
     P = plane_create(60);
-	//shuttle = obj_create("trolluvd1.obj");
-	//helicopter = obj_create("helicopter");
 	jet = obj_create("jet.obj");
 	troll = obj_create("trolluvd1.obj");
+	helicopter = obj_create("helicopter.obj");
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
@@ -213,17 +267,26 @@ void keyboard(unsigned char key, int x, int y)
 			position[2] += 1.0;
 			break;
 		case 'i':
-			controlTheTroll[2] += 1.0;
+			addedTime += .1;
 			break;
 		case 'k':
-			controlTheTroll[2] -= 1.0;
+			addedTime -= .1;
 		case 'j':
-			controlTheTroll[0] += 1.0;
+			timeFrequency += .1;
 			break;
 		case 'l': 
-			controlTheTroll[0] -= 1.0;
+			timeFrequency -= .1;
 			break;
-
+		case 'h':
+			brickColorChanger += .1;
+			cout << "Brick Color Changer Variable: " << brickColorChanger << endl;
+			glUniform3f(glGetUniformLocation(brickprogram, "brick_color"), 1.0, .3, brickColorChanger);
+			break;
+		case 'u':
+			brickColorChanger -= .1;
+			cout << "Brick Color Changer Variable: " << brickColorChanger << endl;
+			glUniform3f(glGetUniformLocation(brickprogram, "brick_color"), 1.0, .3, brickColorChanger);
+			break;
     }
 	glutPostRedisplay();
 }
@@ -253,15 +316,15 @@ void keyboardup(unsigned char key, int x, int y) {
 			position[2] += 1.0;
 			break;
 		case 'i':
-			controlTheTroll[2] += 1.0;
+			//controlTheTroll[2] += 1.0;
 			break;
 		case 'k':
-			controlTheTroll[2] -= 1.0;
+			//controlTheTroll[2] -= 1.0;
 		case 'j':
-			controlTheTroll[0] += 1.0;
+			//controlTheTroll[0] += 1.0;
 			break;
 		case 'l': 
-			controlTheTroll[0] -= 1.0;
+			//controlTheTroll[0] -= 1.0;
 			break;
 
 
@@ -328,6 +391,11 @@ void mouse(int button, int state, int x, int y)
         click_light[1]    = light[1];
     }
     else click_button = -1;
+
+	if(colors_animation) {
+		glUniform2f(glGetUniformLocation(animationprogram, "mouse"), x, y);
+		glutPostRedisplay();
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -362,11 +430,9 @@ static void pan_camera(GLfloat dx, GLfloat dy)
 
 static void camera_fly()
 {
-	std::cout  << "Camera_FLY CALLED with Rotation 1 and 2 as " << rotation[0] << " " << rotation[1] << std::endl;
+	
     glRotatef(rotation[0], 1.0f, 0.0f, 0.0f);
     glRotatef(rotation[1], 0.0f, 1.0f, 0.0f);
-
-	std::cout << "Will be translating pos 1 2 3: " << position[0] << " " << position[1] << " " << position[2] << std::endl;
     glTranslatef(-position[0], -position[1], -position[2]);
 }
 
@@ -407,93 +473,315 @@ static void lights()
 ////////////////////////////////////////////////////////////////////
 void createMenuItems(){
 
-	fragmentMenu = glutCreateMenu(processItem1);
+	shaderMenu = glutCreateMenu(processItem1);
 	{
-		glutAddMenuEntry("Brick Fragment Program", FIRSTFRAGMENT);
-		glutAddMenuEntry("Second Fragment Program", SECONDFRAGMENT);
-		glutAddMenuEntry("Third Fragment Program", THIRDFRAGMENT);
+		glutAddMenuEntry("Brick Shader", FIRSTOPTION);
+		glutAddMenuEntry("Wave Shader", SECONDOPTION);
+		glutAddMenuEntry("Toon Shader", THIRDOPTION);
+		glutAddMenuEntry("Colors Animation", FOURTHOPTION);
+		glutAddMenuEntry("Flatten Shader", FIFTHOPTION);
 	}
 
-	vertexMenu = glutCreateMenu(processItem2);
+	modelMenu = glutCreateMenu(processItem2);
 	{
-		glutAddMenuEntry("Wave Vertex Program", FIRSTVERTEX);
-		glutAddMenuEntry("Second Vertext Program", SECONDVERTEX);
-		glutAddMenuEntry("Third Vertext Program", THIRDVERTEX);
+		glutAddMenuEntry("Jet", FIRSTMODEL);
+		glutAddMenuEntry("Troll", SECONDMODEL);
+		glutAddMenuEntry("Helicopter", THIRDMODEL);
+		glutAddMenuEntry("No Models", FIFTHMODEL);
+		glutAddMenuEntry("Plane Toggle", FOURTHMODEL);
+
 	}
 
 	mainMenu = glutCreateMenu(processMain);
 	{
-		glutAddSubMenu("Toggle Vertex Programs", vertexMenu);
-		glutAddSubMenu("Toggle Fragment Programs", fragmentMenu);
+		glutAddSubMenu("Swap Models", modelMenu);
+		glutAddSubMenu("Toggle Shaders", shaderMenu);
+		glutAddMenuEntry("Reset" , 1);
 	}
 
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
 void processItem1(int option) {
-	
+	ShaderLoader *loader;
+	loader = new ShaderLoader();
 	switch (option) {
-		case FIRSTFRAGMENT:
-			CreatePhong();
+		case FIRSTOPTION:
+
+			fragmentNames.clear();
+			vertexNames.clear();
+
+			fragmentNames.push_back("brick_fragment.glsl");
+			vertexNames.push_back("brick_vertex.glsl");
+			
+			brickprogram = createProgram();
+
+			glUseProgram(brickprogram);
+
+			glUniform3f(glGetUniformLocation(brickprogram, "brick_color"), 1.0, .3, brickColorChanger);
+			glUniform3f(glGetUniformLocation(brickprogram, "mortar_color"), .85, .86, .84);
+		    glUniform2f(glGetUniformLocation(brickprogram, "brick_size"), .3, .15);
+			glUniform2f(glGetUniformLocation(brickprogram, "brick_frac"), .90, .85);
+
+			glutPostRedisplay();
 
 			break;
-		case SECONDFRAGMENT:
+		case SECONDOPTION:
+
+			fragmentNames.clear();
+			vertexNames.clear();
+			vertexNames.push_back("wave_vertex.glsl");
 			
+			waveprogram = createProgram();
+
+			glUseProgram(waveprogram);
+			
+			wave = true;
+			glUniform1f(glGetUniformLocation(waveprogram, "time"), timeFactor);
+
+			glutPostRedisplay();
+				break;
+		case THIRDOPTION:
+			fragmentNames.clear();
+			vertexNames.clear();
+
+			fragmentNames.push_back("toon_fragment.glsl");
+			vertexNames.push_back("toon_vertex.glsl");
+
+			toonprogram = createProgram();
+
+			glUseProgram(toonprogram);
+
+			glutPostRedisplay();
+
 			break;
-		case THIRDFRAGMENT :
+		case FOURTHOPTION:
+			fragmentNames.clear();
+			vertexNames.clear();
+
+			fragmentNames.push_back("colors_animation_fragment.glsl");
+
+			animationprogram = createProgram();
+
+			glUseProgram(animationprogram);
+
+			colors_animation = true;
+			glUniform1f(glGetUniformLocation(animationprogram, "time"), 1.0);
+			glUniform2f(glGetUniformLocation(animationprogram, "mouse"), 0.0, 0.0);
+			glUniform2f(glGetUniformLocation(animationprogram, "resolution"), 640, 480);
+
+			cout << "animation program succeeded" << endl;
+			
+			glutPostRedisplay();
 			break;
+		case FIFTHOPTION:
+
+			fragmentNames.clear();
+			vertexNames.clear();
+
+			fragmentNames.push_back("flatten_fragment.glsl");
+			vertexNames.push_back("flatten_vertex.glsl");
+
+			flattenprogram = createProgram();
+
+			glUseProgram(flattenprogram);
+
+			flattened = true;
+			glUniform1f(glGetUniformLocation(flattenprogram, "time"),  timeFactor);
+			break;
+
+		default:
+			cout << "Shouldn't be here bud...GET OUT!!!" << endl;
+		break;
 	}
 }
 
 void processItem2(int option) {
 	switch(option) {
-	case FIRSTVERTEX:
-
+	case FIRSTMODEL:
+		scenario = JET;
+		glutPostRedisplay();
 		break;
-	case SECONDVERTEX:
-
+	case SECONDMODEL:
+		scenario = TROLL;
+		glutPostRedisplay();
 		break;
-
-	case THIRDVERTEX:
-
+	case THIRDMODEL:
+		scenario = HELICOPTER;
+		glutPostRedisplay();
 		break;
+	case FOURTHMODEL:
+		if(enabledPlane) {
+			enabledPlane = false;
+		} else {
+			enabledPlane = true;
+		}
+		glutPostRedisplay();
+		break;
+	case FIFTHMODEL:
+		scenario = NONE;
+		glutPostRedisplay();
+		break;
+	default:
+		cout << "Shouldn't be here bud...GET OUT!!! 2" << endl;
+	break;
 
 
 	}
 
 }
- //Empt method
-void processMain(int option) {}
 
-void CreatePhong() {
+void processMain(int option) {
+	switch(option) {
+	case 1: 
+		glUseProgram(0); 
+		wave = false;
+		colors_animation = false;
+		flattened = false;
+		glutPostRedisplay();
+		break;
+	default:
+		cout << "Shouldn't be here bud...GET OUT!!!" << endl;
+	break;
+	}
+}
+
+GLuint createProgram() {
+	GLuint *_fragment;
+	GLuint *_vertex;
+	GLchar *vertexText;
+	GLchar *fragmentText;
 	ShaderLoader *loader;
 	loader = new ShaderLoader();
-	GLuint phong_program = glCreateProgram();
 
-	//Phong shader
-	GLuint phong_vertex = glCreateShader(GL_VERTEX_SHADER);
+ 	GLuint _program = glCreateProgram();
 
-	GLchar *phong_vertext_text = loader->load("phongvertex.glsl"); 
-	glShaderSource(phong_vertex, 1, (const GLchar **) &phong_vertext_text, 0);
-	glCompileShader(phong_vertex);
-	free(phong_vertext_text);
+	for(int i = 0; i < fragmentNames.size(); i++) {
+		_fragment = new GLuint;
 
-	GLuint phong_fragment = glCreateShader(GL_FRAGMENT_SHADER);
+		*_fragment = glCreateShader(GL_FRAGMENT_SHADER);
 
-	GLchar *phong_fragment_text = loader->load("phongfragment.glsl");
-	glShaderSource(phong_fragment, 1, (const GLchar**) &phong_fragment_text, 0);
-	glCompileShader(phong_fragment);
-	free(phong_fragment_text);
+		fragmentText = loader->load(fragmentNames[i]);
 
-			
+		glShaderSource(*_fragment, 1, (const GLchar **) &fragmentText, 0);
 
-	glAttachShader(phong_program, phong_vertex);
-	glAttachShader(phong_program, phong_fragment);
+		glCompileShader(*_fragment);
 
-	glLinkProgram(phong_program);
+		if(checkCompilationStatus(*_fragment)) {
+			std::cout << "Fragment Shader " << i << " Compiled Properly" << std::endl;
+		} else {
+			std::cout << "Shaders had a problem compiling" << std::endl;
+			return NULL;
+		}
 
-	glUseProgram(phong_program);
+		glAttachShader(_program, *_fragment);
+
+		free(fragmentText);
+	}
+
+	for(int j = 0; j < vertexNames.size(); j++) {
+		_vertex = new GLuint;
+		*_vertex = glCreateShader(GL_VERTEX_SHADER);
+	
+	
+		vertexText = loader->load(vertexNames[j]);
+
+	
+		glShaderSource(*_vertex, 1, (const GLchar **) &vertexText, 0);
+
+	
+		glCompileShader(*_vertex);
+
+		if(checkCompilationStatus(*_vertex)) {
+			std::cout << "Shaders Compiled Properly" << std::endl;
+		} else {
+			std::cout << "Shaders had a problem compiling" << std::endl;
+			return NULL;
+		}
+
+	
+		free(vertexText);
+
+	
+		glAttachShader(_program, *_vertex);
+
+	}
+
+	glLinkProgram(_program);
+
+	if(checkLinkingStatus(_program)) {
+		std::cout  << "Program Linked Successfully" << std::endl;
+	} else {
+		std::cout << "Program had a problem Linking" << std::endl;
+		return NULL;
+	}
+
+	return _program;
+
 }
+
+bool checkCompilationStatus(GLuint object) {
+	GLchar *p;
+	GLint s, n;
+
+	glGetShaderiv(object, GL_COMPILE_STATUS, &s);
+	glGetShaderiv(object, GL_INFO_LOG_LENGTH, &n);
+	
+	if ((s == 0) && (p = (GLchar *) calloc(n + 1, 1))) {
+		glGetShaderInfoLog(object, n, NULL, p);
+		fprintf(stderr, "OpenGL Shader Error:\n%s", p);
+		free(p);
+		return false;
+	}
+
+	return true;
+
+}
+
+bool checkLinkingStatus(GLuint object) {
+	GLchar *p;
+	GLint s, n;
+
+	glGetProgramiv(object, GL_LINK_STATUS, &s);
+	glGetProgramiv(object, GL_INFO_LOG_LENGTH, &n);
+	
+	if ((s == 0) && (p = (GLchar *) calloc(n + 1, 1))) {
+		glGetProgramInfoLog(object, n, NULL, p);
+		fprintf(stderr, "OpenGL Program Error:\n%s", p);
+		free(p);
+		return false;
+	}
+
+	return true;
+}
+
+
+void idle() {
+	
+	clock_t current = clock();
+	float difference = (current - initial) / 1000.0f;
+
+	if(difference >  timeFrequency) {
+		
+		timeFactor += addedTime;
+
+		if(wave) {
+			glUniform1f(glGetUniformLocation(waveprogram, "time"), timeFactor);
+			glutPostRedisplay();
+		} else if(colors_animation) {
+			glUniform1f(glGetUniformLocation(animationprogram, "time"), timeFactor);
+			glutPostRedisplay();
+		} else if(flattened) {
+			glUniform1f(glGetUniformLocation(flattenprogram, "time"), timeFactor);
+			glutPostRedisplay();
+		}
+		initial = clock();
+		
+	}
+
+	
+}
+
 
 
 

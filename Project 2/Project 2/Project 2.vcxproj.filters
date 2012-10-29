@@ -36,14 +36,8 @@
     <ClCompile Include="plane.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="phongfragment.glsl">
-      <Filter>Source Files\Fragment</Filter>
-    </ClCompile>
-    <ClCompile Include="phongvertex.glsl">
-      <Filter>Source Files\Vertex</Filter>
-    </ClCompile>
-    <ClCompile Include="waveglsl">
-      <Filter>Source Files\Vertex</Filter>
+    <ClCompile Include="shaderloader.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -64,8 +58,32 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="brick.glsl">
+    <None Include="wave_fragment.glsl">
       <Filter>Source Files\Fragment</Filter>
+    </None>
+    <None Include="brick_fragment.glsl">
+      <Filter>Source Files\Fragment</Filter>
+    </None>
+    <None Include="brick_vertex.glsl">
+      <Filter>Source Files\Vertex</Filter>
+    </None>
+    <None Include="toon_fragment.glsl">
+      <Filter>Source Files\Fragment</Filter>
+    </None>
+    <None Include="toon_vertex.glsl">
+      <Filter>Source Files\Vertex</Filter>
+    </None>
+    <None Include="wave_vertex.glsl">
+      <Filter>Source Files\Vertex</Filter>
+    </None>
+    <None Include="colors_animation_fragment.glsl">
+      <Filter>Source Files\Fragment</Filter>
+    </None>
+    <None Include="flatten_fragment.glsl">
+      <Filter>Source Files\Fragment</Filter>
+    </None>
+    <None Include="flatten_vertex.glsl">
+      <Filter>Source Files\Vertex</Filter>
     </None>
   </ItemGroup>
 </Project>
