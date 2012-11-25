@@ -1,4 +1,4 @@
-﻿Build started 10/28/2012 9:45:33 PM.
+﻿Build started 10/28/2012 10:15:34 PM.
      1>Project "C:\Users\Pop\Documents\Development\Classes\ME4573\Project 2\Project 2\Project 2.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
@@ -25,18 +25,17 @@
      1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\main.cpp(522): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
      1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\main.cpp(523): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
      1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\main.cpp(524): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\main.cpp(660): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\main.cpp(683): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\main.cpp(659): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\pop\documents\development\classes\me4573\project 2\project 2\main.cpp(682): warning C4018: '<' : signed/unsigned mismatch
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Pop\Documents\Development\Classes\ME4573\Project 2\Debug\Project 2.exe" /INCREMENTAL /NOLOGO glew32.lib freeglut.lib libjpeg.lib libpng.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Pop\Documents\Development\Classes\ME4573\Project 2\Debug\Project 2.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Pop\Documents\Development\Classes\ME4573\Project 2\Debug\Project 2.lib" /MACHINE:X86 Debug\image.obj
          Debug\main.obj
          Debug\obj.obj
          Debug\plane.obj
          Debug\shaderloader.obj
-     1>LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
          Project 2.vcxproj -> C:\Users\Pop\Documents\Development\Classes\ME4573\Project 2\Debug\Project 2.exe
      1>Done Building Project "C:\Users\Pop\Documents\Development\Classes\ME4573\Project 2\Project 2\Project 2.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:02.39
+Time Elapsed 00:00:02.60
