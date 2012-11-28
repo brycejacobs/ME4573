@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <errno.h>
 
+
 #include "gl.h"
 
 /* NOTE: Channel byte count implies channel storage type:                     */
@@ -357,6 +358,7 @@ void image_flip(int w, int h, int c, int b, void *p)
             memcpy(b, t, s);
         }
         free(t);
+
     }
     else fail("image_flip", "Failure to allocate temporary buffer");
 }
@@ -450,7 +452,6 @@ void *image_read_png(const char *name, int *w, int *h, int *c, int *b)
 
     png_destroy_read_struct(&rp, &ip, NULL);
     fclose(fp);
-
     return p;
 }
 

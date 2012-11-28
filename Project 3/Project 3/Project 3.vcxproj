@@ -96,6 +96,12 @@
     <ClCompile Include="view.c" />
     <ClCompile Include="viewglut.c" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="spotlightFragmentShader.glsl" />
+    <None Include="spotlightVertexShader.glsl" />
+    <None Include="thirteenBoxFragmentShader.glsl" />
+    <None Include="thirteenBoxVertexShader.glsl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -1,4 +1,5 @@
 #include "shaderloader.h"
+#include <iostream>
 
 
 
@@ -19,6 +20,7 @@ char *ShaderLoader::load(const char *name) {
 	
 	char *pointer;
 
+	std::cout << "Returning from load for " << name << std::endl;
 	return pointer = (char*) p;
 
 }
