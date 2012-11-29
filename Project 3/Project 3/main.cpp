@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <math.h>
 
 #include "gl.h"
 #include "image.h"
@@ -22,11 +23,6 @@ void MainMenu(int);
 void ModelMenu(int);
 void ShaderMenu(int);
 
-/* OpenGL Shader Prototypes go here */
-GLuint createProgram(const char *, const char *);
-bool checkCompilationStatus(GLuint);
-bool checkLinkingStatus(GLuint);
-
 /* Frame Buffer Prototypes below */
 bool CheckFrameBuffer();
 void fbofail(std::string);
@@ -34,10 +30,9 @@ void fbofail(std::string);
 
 /*All Other Prototypes */
 void Initialize();
-void InitializeTextures();
 void LoadTextures(const char *);
-
-
+static void lights();
+static void pan_light(GLfloat, GLfloat);
 /* Global Variables start here */
 
 //For camera
@@ -55,6 +50,21 @@ bool planeEnabled;
 
 //For SpotLight
 int spotLightChosen;
+
+//For Light
+//light position variables
+static int      click_modifiers;
+static GLfloat  click_light[2];
+static int      click_button = -1;
+static int      click_x;
+static int      click_y;
+static GLfloat  light[2]    = { -60.0, 30.0             };
+static GLfloat  point[4]    = {   0.0,  0.0,  0.0,  0.0 };
+static GLfloat  zoom        = 0.5;
+
+//For Loading Shaders with objects
+ShaderLoader *boxloader;
+ShaderLoader *spotlight1loader;
 
 /* All of our definitions should go here */
 #define THIRTEENBOX 1
@@ -102,8 +112,8 @@ static void display() {
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 	//glMatrixMode(GL_PROJECTION);
-	//glLoadIdentity();
-
+	glLoadIdentity();
+	
 	GLfloat S[16] = {
 			0.5f, 0.0f, 0.0f, 0.0f,
 			0.0f, 0.5f, 0.0f, 0.0f,
@@ -114,13 +124,24 @@ static void display() {
 	GLdouble size = 16.0;
 
 	switch(spotLightChosen) {
-	case SPOTLIGHT1:
-		glMatrixMode(GL_TEXTURE);
-		{
-			glLoadMatrixf(S);
-		   // glOrtho(-size, +size, -size, +size, -size, +size);
+	case SPOTLIGHT1: {
+						GLint spotlight1location = glGetUniformLocation(spotlight1loader->getProgram(), "image");
+						spotlight1loader->bind();
+						glUniform1i(spotlight1location, 0);
 
-		}
+						spotlight1loader->bind();
+						glActiveTexture(GL_TEXTURE0);
+						//std::cout << "Texture 1: " << boxloader->getTexture(0) << std::endl;
+						glBindTexture(GL_TEXTURE_2D, spotlight1loader->getTexture(0));
+						
+						glMatrixMode(GL_TEXTURE);
+						{
+							glLoadMatrixf(S);
+						    glOrtho(-size, +size, -size, +size, -size, +size);
+						    glRotated(-light[0], 1.0, 0.0, 0.0);
+							glRotated(-light[1], 0.0, 1.0, 0.0);
+						}
+					}
 		break;
 	case SPOTLIGHT2:
 		break;
@@ -134,6 +155,8 @@ static void display() {
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+
+	lights();
 
 	/*Camera */
 	viewglut_apply(camera);
@@ -156,12 +179,31 @@ static void display() {
 
     glTranslated(0.0, 1.0, 0.0);
 	switch(modelChosen) {
-	case THIRTEENBOX:
-		obj_render(box);
-		glActiveTexture(GL_TEXTURE0 + 0);
-		glActiveTexture(GL_TEXTURE0 + 2);
-		glActiveTexture(GL_TEXTURE0 + 4);
-		break;
+	case THIRTEENBOX:{	//glMatrixMode(GL_TEXTURE);
+						//glEnable(GL_TEXTURE_2D);
+						GLint diffuselocation = glGetUniformLocation(boxloader->getProgram(), "diffuse_texture");
+						GLint normallocation = glGetUniformLocation(boxloader->getProgram(), "normal_texture");
+
+						//std::cout << "diffuse location: " << diffuselocation << std::endl;
+						//std::cout << "normal location: " << normallocation << std::endl;
+
+						boxloader->bind();
+						glUniform1i(diffuselocation, 0);
+						glUniform1i(normallocation, 1);
+
+						//glActiveTexture(GL_TEXTURE0 + boxloader->getTexture(0));
+						glActiveTexture(GL_TEXTURE0);
+						//std::cout << "Texture 1: " << boxloader->getTexture(0) << std::endl;
+						glBindTexture(GL_TEXTURE_2D, boxloader->getTexture(0));
+						glActiveTexture(GL_TEXTURE1);
+						//std::cout << "Texture 2: " << boxloader->getTexture(1) << std::endl;
+						glBindTexture(GL_TEXTURE_2D, boxloader->getTexture(1));
+					
+						obj_render(box);
+						
+						boxloader->unbind();
+					}
+					break;
 	case TROLL:
 		obj_render(troll);
 		break;
@@ -172,7 +214,9 @@ static void display() {
 		std::cout << "modelChosen Out of Range. Draw Method-modelChosen = " << modelChosen << std::endl;
 		break;
 	}
+	glMatrixMode(GL_MODELVIEW);
 
+	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 	glutSwapBuffers();
 }
 
@@ -191,20 +235,69 @@ static void keyboardup(unsigned char k, int x, int y) {
 }
 
 static void motion(int x, int y) {
-	/* Camera */
-	viewglut_point(camera, x, y);
+
+	const int w = glutGet(GLUT_WINDOW_WIDTH);
+    const int h = glutGet(GLUT_WINDOW_HEIGHT);
+
+    GLfloat H = .1f * zoom * w / h;
+    GLfloat V = .1f * zoom;
+    GLfloat r;
+
+    /* Compute the pointer motion as a fraction of window size. */
+
+    GLfloat dx = (GLfloat) (x - click_x) / w;
+    GLfloat dy = (GLfloat) (y - click_y) / h;
+
+   	if (click_button == GLUT_LEFT_BUTTON)
+    {
+		if (click_modifiers == GLUT_ACTIVE_ALT){
+			std::cout << "Panning Light" << std::endl;
+			pan_light (dx, dy); 
+		} 
+    } else {
+    	/* Camera */
+		std::cout << "Moving Camera" << std::endl;
+		viewglut_point(camera, x, y);
+    }
+
+    /* Compute the eye-space pointer vector. */
+    point[0] =  (2.0f * x / w - 1.0f) * H;
+    point[1] = -(2.0f * y / h - 1.0f) * V;
+    point[2] = -(0.1f);
+    r = 1.0f / (GLfloat) sqrt(point[0] * point[0] +
+                              point[1] * point[1] +
+                              point[2] * point[2]);
+    point[0] *= r;
+    point[1] *= r;
+    point[2] *= r;
+	
 
 }
 
 static void mouse(int b, int s, int x, int y) {
 	/* Camera */
 	if(b == GLUT_LEFT_BUTTON) {
+		click_modifiers   = glutGetModifiers();
 		if(s == GLUT_DOWN) {
-			viewglut_click(camera, x, y, 1);
+			if(click_modifiers == GLUT_ACTIVE_ALT) {
+				std::cout << "Mouse has ALT Modifier" << std::endl;
+				click_light[0]    = light[0];
+	        	click_light[1]    = light[1];
+	        	click_button      = b;
+	            click_x           = x;
+	            click_y           = y;
+			} else {
+				std::cout << "ViewGlut caught click." << std::endl;
+				viewglut_click(camera, x, y, 1);
+			}
+			
+			
+
 		} else {
 			viewglut_click(camera, x, y, 0);
 		}
 	}
+
 }
 
 /* All OpenGL Menu Prototype Definitions go here */
@@ -233,11 +326,12 @@ void createMenuItems() {
 
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
+
 void MainMenu(int option) {
 	switch(option) {
 	case 1: 
 		std::cout << "User has chose to reset the program" << std::endl;
-		glActiveTexture(GL_TEXTURE15);
+		//glActiveTexture(GL_TEXTURE15);
 		glUseProgram(0);
 		glutPostRedisplay();
 		break;
@@ -250,46 +344,6 @@ void ModelMenu(int option) {
 	switch(option) {
 	case THIRTEENBOX:
 		std::cout << "User has selected the ThirteenBox Model" << std::endl;
-		GLuint diffuse;
-		GLuint normal;
-		GLuint specular;
-
-		GLint baseDiffuseLocation;
-		GLint baseNormalLocation;
-		GLint baseSpecularLocation;
-
-		glGenTextures(1, &diffuse);
-		LoadTextures("thirteen-diffuse.png");
-
-		glGenTextures(1, &normal);
-		LoadTextures("thirteen-normal.png");
-		
-		glGenTextures(1, &specular);
-		LoadTextures("thirteen-specular.png");
-
-		GLuint thirteenProgram;
-
-		thirteenProgram = createProgram("spotlightVertexShader.glsl", "spotlightFragmentShader.glsl");
-
-		baseDiffuseLocation = glGetUniformLocation(thirteenProgram, "diffuse");
-		baseNormalLocation = glGetUniformLocation(thirteenProgram, "normalvec");
-		baseSpecularLocation = glGetUniformLocation(thirteenProgram, "specular");
-		
-		glUseProgram(thirteenProgram);
-
-		glUniform1i(baseDiffuseLocation, 0);
-		glUniform1i(baseNormalLocation, 2);
-		glUniform1i(baseSpecularLocation, 4);
-
-		glActiveTexture(GL_TEXTURE0 + 0);
-		glBindTexture(GL_TEXTURE_2D, diffuse);
-
-		glActiveTexture(GL_TEXTURE0 + 2);
-		glBindTexture(GL_TEXTURE_2D, normal);
-
-		glActiveTexture(GL_TEXTURE0 + 4);
-		glBindTexture(GL_TEXTURE_2D, specular);
-
 		modelChosen = THIRTEENBOX;
 		glutPostRedisplay();
 		break;
@@ -312,26 +366,9 @@ void ModelMenu(int option) {
     glutPostRedisplay();
 }
 void ShaderMenu(int option) {
-	GLuint spotLight1Program;
-	GLuint spotLight2Program;
-	GLuint spotlight;
-	GLint baseImageLoc;
 	switch(option) {
 	case 1:
 		std::cout << "Spotlight 1 selected" << std::endl;
-		
-		glGenTextures(1, &spotlight);
-		LoadTextures("spotlight2.png");
-
-		spotLight1Program = createProgram("spotlightVertexShader.glsl", "spotlightFragmentShader.glsl");
-
-		baseImageLoc = glGetUniformLocation(spotLight1Program, "image");
-		
-		glUseProgram(spotLight1Program);
-		glUniform1i(baseImageLoc, 0);
-
-		glActiveTexture(GL_TEXTURE0 + 0);
-		glBindTexture(GL_TEXTURE_2D, spotlight);
 		spotLightChosen = SPOTLIGHT1;
 		glutPostRedisplay();
 		break;
@@ -344,118 +381,6 @@ void ShaderMenu(int option) {
 	}
 
 }
-
-/* Shader method prototypes go here */
-GLuint createProgram(const char *vertexShaderName, const char *fragmentShaderName) {
-	std::cout << "Creating new program for shaders " << vertexShaderName << " and " << fragmentShaderName << std::endl;
-	GLuint *_fragment;
-	GLuint *_vertex;
-	GLchar *vertexText;
-	GLchar *fragmentText;
-	ShaderLoader *loader;
-	loader = new ShaderLoader();
-
- 	GLuint _program = glCreateProgram();
-
-	//Handle the Fragment Shader
-	{
-        _fragment = new GLuint;
-        *_fragment = glCreateShader(GL_FRAGMENT_SHADER);
-
-		fragmentText = loader->load(fragmentShaderName);
-
-        glShaderSource(*_fragment, 1, (const GLchar **) &fragmentText, 0);
-
-		std::cout << "Compiling Fragment Shader" << std::endl;
-        glCompileShader(*_fragment);
-
-		//Check to see if the shader compiled correctly.
-        if(checkCompilationStatus(*_fragment)) {
-            std::cout << "Fragment Shader Compiled Properly" << std::endl;
-        } else {
-            std::cout << "Fragment Shader had a problem compiling" << std::endl;
-            return NULL;
-        }
-
-        glAttachShader(_program, *_fragment);
-
-        free(fragmentText);
-	}
-
-	//Handle the Vertex Shader
-    {
-        _vertex = new GLuint;
-        *_vertex = glCreateShader(GL_VERTEX_SHADER);
-
-	    vertexText = loader->load(vertexShaderName);
-        glShaderSource(*_vertex, 1, (const GLchar **) &vertexText, 0);
-
-		std::cout << "Compiling Vertex Shader" << std::endl;
-        glCompileShader(*_vertex);
-
-		//Check to see if the shader compiled correctly.
-        if(checkCompilationStatus(*_vertex)) {
-			std::cout << "Vertex Shader Compiled Properly" << std::endl;
-        } else {
-			std::cout << "Vertex Shader had a problem compiling" << std::endl;
-			return NULL;
-        }
-
-	    glAttachShader(_program, *_vertex);
-
-	    free(vertexText);
-    }
-
-	std::cout << "Linking Program" << std::endl;
-    glLinkProgram(_program);
-
-	//Check to make sure our program was linked properly.
-    if(checkLinkingStatus(_program)) {
-		std::cout  << "Program Linked Successfully" << std::endl;
-    } else {
-		std::cout << "Program had a problem Linking" << std::endl;
-		return NULL;
-    }
-
-    return _program;
-}
-
-bool checkCompilationStatus(GLuint object) {
-	GLchar *p;
-	GLint s, n;
-
-	std::cout << "Checking Compilation Status of Program" << std::endl;
-
-	glGetShaderiv(object, GL_COMPILE_STATUS, &s);
-	glGetShaderiv(object, GL_INFO_LOG_LENGTH, &n);
-
-	if ((s == 0) && (p = (GLchar *) calloc(n + 1, 1))) {
-		glGetShaderInfoLog(object, n, NULL, p);
-		fprintf(stderr, "OpenGL Shader Error:\n%s", p);
-		free(p);
-		return false;
-	}
-
-	return true;
-}
-
-bool checkLinkingStatus(GLuint object) {
-	std::cout << "Checking Linking Status of Program" << std::endl;
-	GLchar *p;
-	GLint s, n;
-
-	glGetProgramiv(object, GL_LINK_STATUS, &s);
-	glGetProgramiv(object, GL_INFO_LOG_LENGTH, &n);
-
-	if ((s == 0) && (p = (GLchar *) calloc(n + 1, 1))) {
-		glGetProgramInfoLog(object, n, NULL, p);
-		fprintf(stderr, "OpenGL Program Error:\n%s", p);
-		free(p);
-		return false;
-	}
-	return true;
-}
-
 
 /*All other Prototypes definitions start here */
 
@@ -472,33 +397,22 @@ void Initialize() {
 	box = obj_create("thirteen-box.obj");
 	troll = obj_create("trolluvd1.obj");
 	
-	glEnable(GL_TEXTURE_2D);
-	//glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	
+	//glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
+	glEnable(GL_LESS);
 	createMenuItems();
 
-	InitializeTextures();
+	boxloader = new ShaderLoader("thirteenBoxVertexShader2.glsl", "thirteenBoxFragmentShader2.glsl");
+	boxloader->initializeTextures("thirteen-diffuse.png");
+	boxloader->initializeTextures("thirteen-normal.png");
+	//boxloader->initializeTextures("thirteen-specular.png");
+
+	spotlight1loader = new ShaderLoader("spotlightVertexShader.glsl", "spotlightFragmentShader.glsl");
+	spotlight1loader->initializeTextures("spotlight2.png");
+
 	std::cout << "Initialization Finished" << std::endl;
 }
 
-void InitializeTextures() {
-	std::cout << "Initializing Textures" << std::endl;
-    /*GLuint spotLight1;
-	GLuint spotLight2;
-
-	glGenTextures(1, &spotLight1);
-	glGenTextures(1, &spotLight2);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, spotLight1);
-	LoadTextures("spotlight2.png");
-*/
-	std::cout << "Initializing Textures Done" << std::endl;
-
-}
 void LoadTextures(const char *textureName) {
 	std::cout << "Loading Texture " << textureName << std::endl;
     int w, h, c, b;
@@ -531,4 +445,38 @@ bool CheckFrameBuffer() {
 }
 void fbofail(std::string message) {
 	std::cout << "Frame Buffer Encountered Problem " << message << std::endl;
+}
+
+
+/* For the lights */
+static void pan_light(GLfloat dx, GLfloat dy)
+{
+    light[0] = click_light[0] +  90.0 * dy;
+    light[1] = click_light[1] + 180.0 * dx;
+
+    if (light[0] >   90.0) light[0]  =  90.0;
+    if (light[0] <  -90.0) light[0]  = -90.0;
+    if (light[1] >  180.0) light[1] -= 360.0;
+    if (light[1] < -180.0) light[1] += 360.0;
+
+    glutPostRedisplay();
+}
+
+static void lights()
+{
+    /* Position the global light. */
+
+    const GLfloat L[4] = { 0.0f, 0.0f, 1.0f, 0.0f };
+
+    glPushMatrix();
+    {
+        glRotatef(light[1], 0.0f, 1.0f, 0.0f);
+        glRotatef(light[0], 1.0f, 0.0f, 0.0f);
+        glLightfv(GL_LIGHT0, GL_POSITION, L);
+    }
+    glPopMatrix();
+
+    /* Position the flashlight. */
+
+    glLightfv(GL_LIGHT1, GL_POSITION, point);
 }

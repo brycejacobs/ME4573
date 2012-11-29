@@ -35,7 +35,7 @@
 #define CONFIG_NO_EXR 1
 #define CONFIG_NO_TIF 1
 //#define CONFIG_NO_PNG 1
-//#define CONFIG_NO_JPG 1
+#define CONFIG_NO_JPG 1
 
 /*----------------------------------------------------------------------------*/
 

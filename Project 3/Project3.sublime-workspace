@@ -1,0 +1,299 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"find",
+				"find_last_not_of(_CharT __c) const	size_type"
+			],
+			[
+				"repl",
+				"replace(_ForwardIterator __first, _ForwardIterator __last, const _Tp &__old_value, const _Tp &__new_value)	void"
+			],
+			[
+				"remove",
+				"remove_if(_ForwardIterator __first, _ForwardIterator __last, _Predicate __pred)	_ForwardIterator"
+			],
+			[
+				"part",
+				"part2	string"
+			],
+			[
+				"sentence",
+				"sentenceWords	vector<string>"
+			],
+			[
+				"rotate",
+				"rotate(_ForwardIterator __first, _ForwardIterator __middle, _ForwardIterator __last)	void"
+			],
+			[
+				"b",
+				"begin()	iterator"
+			],
+			[
+				"res",
+				"resize(size_type __new_size)	void"
+			],
+			[
+				"cop",
+				"copy(_InputIterator __first, _InputIterator __last, _OutputIterator __result)	_OutputIterator"
+			],
+			[
+				"it",
+				"const_iterator	typedef"
+			],
+			[
+				"append",
+				"append(_InputIterator __first, _InputIterator __last)	basic_string<_CharT, _Traits, _Alloc> &"
+			],
+			[
+				"homework",
+				"homeworkGrade	double"
+			],
+			[
+				"home",
+				"homeworkGrade	double"
+			],
+			[
+				"getWords",
+				"getWords() const	std::vector<std::string>"
+			],
+			[
+				"getLine",
+				"getline(char_type *__s, streamsize __n, char_type __delim)	__istream_type &"
+			],
+			[
+				"disl",
+				"displayFunction"
+			],
+			[
+				"GL_",
+				"GL_ELEMENT_ARRAY_BUFFER"
+			],
+			[
+				"glB",
+				"glBindBuffer"
+			],
+			[
+				"_el",
+				"_elementIndexCount"
+			],
+			[
+				"_v",
+				"_vertCount"
+			],
+			[
+				"_",
+				"_verticeIndexCount"
+			],
+			[
+				"_ver",
+				"_verticeIndexCount"
+			],
+			[
+				"Quin",
+				"quintileCount"
+			],
+			[
+				"nu",
+				"numThree"
+			],
+			[
+				"n",
+				"numTwo"
+			],
+			[
+				"num",
+				"numOne"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "Packages/C++/C++.sublime-build",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+			[
+				"",
+				"Package Control: List Packages"
+			],
+			[
+				"Sublim",
+				"Preferences: SublimeClang Settings – User"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 125.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/Bryce/Documents/Development/School/ME4573/Project 3/Project3.sublime-project",
+		"/Users/Bryce/Documents/Class Projects/CSC1254/prog3/task3/task3",
+		"/Users/Bryce/Documents/Class Projects/CSC1254/prog3/task1.cpp",
+		"/Users/Bryce/Documents/Class Projects/CSC1254/prog3/read_words.hpp",
+		"/Users/Bryce/Documents/Class Projects/CSC1254/prog3/input.txt",
+		"/Users/Bryce/Documents/Class Projects/CSC1254/prog3/makefile",
+		"/Users/Bryce/Documents/Class Projects/CSC1254/prog3/task2/read_words.cpp",
+		"/Users/Bryce/Documents/Class Projects/CSC1254/prog3/task2/read_words.hpp",
+		"/Users/Bryce/Documents/Class Projects/CSC1254/prog3/read_words.cpp",
+		"/Users/Bryce/Desktop/exp4-final kinda.asm",
+		"/Users/Bryce/Documents/Class Projects/CSC1254/prog2/task3/task3.cpp",
+		"/Users/Bryce/Documents/Class Projects/CSC1254/prog2/task2/task2.cpp",
+		"/Users/Bryce/Documents/Class Projects/CSC1254/prog2/task2/numbers.txt",
+		"/Users/Bryce/Documents/Class Projects/CSC1254/prog2/task1/stringinput.txt",
+		"/Users/Bryce/Documents/Class Projects/CSC1254/prog2/task1/task1.cpp",
+		"/Users/Bryce/Documents/Class Projects/ME4573/Examples/demo.c",
+		"/Users/Bryce/Library/Application Support/Sublime Text 2/Packages/User/SublimeClang.sublime-settings",
+		"/Users/Bryce/Documents/Class Projects/ME4573/ME4573/Project 1/Project 1/GLObjects.h",
+		"/Users/Bryce/Documents/Class Projects/ME4573/ME4573/Project 1/Project 1/GLHandler.h",
+		"/Users/Bryce/Documents/Class Projects/ME4573/ME4573/Project 1/Project 1/747.mesh",
+		"/Users/Bryce/Documents/Class Projects/ME4573/ME4573/Project 1/Project 1/FileLoader.cpp",
+		"/Users/Bryce/Documents/Class Projects/ME4573/ME4573/Project 1/Project 1/FileLoader.h",
+		"/Users/Bryce/Documents/Class Projects/ME4573/ME4573/Project 1/Project 1/makefile",
+		"/Users/Bryce/Documents/Class Projects/ME4573/src/recompile",
+		"/Users/Bryce/Documents/Class Projects/CSC1254/prog1/task4.cpp",
+		"/Users/Bryce/Documents/Class Projects/ME4573/src/make",
+		"/Users/Bryce/Documents/Class Projects/CSC1254/prog1/task1.cpp",
+		"/Users/Bryce/Documents/Class Projects/CSC1254/prog1/task2.cpp",
+		"/Users/Bryce/Documents/Class Projects/CSC1254/prog1/task3.cpp",
+		"/Users/Bryce/Documents/Repos/BrinkServer/brink/models/user.js",
+		"/Users/Bryce/Documents/Repos/BrinkServer/brink/models/checkin.js",
+		"/Users/Bryce/Documents/Repos/BrinkServer/brink/models/feed.js",
+		"/Users/Bryce/Documents/Repos/BrinkServer/brink/models/facebookfriend.js",
+		"/Users/Bryce/Documents/Repos/BrinkServer/brink/controllers/users.js",
+		"/Users/Bryce/Documents/Repos/BrinkServer/brink/models/event.js",
+		"/Users/Bryce/Documents/Repos/BrinkServer/brink/models/Event.js",
+		"/Users/Bryce/Documents/Repos/BrinkServer/brink/config/config.js",
+		"/Users/Bryce/Documents/Repos/BrinkServer/brink/models/FacebookFriend.js",
+		"/Users/Bryce/Documents/Repos/BrinkServer/brink/routes.js",
+		"/Users/Bryce/profile",
+		"/Users/Bryce/Documents/Repos/BrinkServer/brink/app.js",
+		"/Users/Bryce/Documents/Class Projects/ME4573/Examples/Teapot/hello-world.c",
+		"/Users/Bryce/Documents/Repos/BrinkServer/brink/storage.js",
+		"/Users/Bryce/Documents/android-sdks/sources/android-16/android/media/Metadata.java",
+		"/Users/Bryce/Documents/Repos/BrinkServer/brink/brink",
+		"/Users/Bryce/Documents/Repos/BrinkServer/brink/folder",
+		"/Users/Bryce/.bash_profile"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.clang":
+	{
+		"height": 100.0
+	},
+	"output.exec":
+	{
+		"height": 132.0
+	},
+	"replace":
+	{
+		"height": 0.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"show_minimap": false,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 280.0,
+	"status_bar_visible": true
+}

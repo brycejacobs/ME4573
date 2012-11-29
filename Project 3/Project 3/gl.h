@@ -28,18 +28,10 @@
 #include "TargetConditionals.h"
 #endif
 
-#if TARGET_OS_IPHONE
-#include <OpenGLES/ES1/gl.h>
-#include <OpenGLES/ES1/glext.h>
-#else
 #ifdef __APPLE__
 #include   <GL/glew.h>
 #include <OpenGL/OpenGL.h>
 #include <GLUT/glut.h>
-#else
-#include   <GL/glew.h>
-#include   <GL/freeglut.h>
-#endif
 #endif
 
 /*----------------------------------------------------------------------------*/

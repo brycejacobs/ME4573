@@ -22,8 +22,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#include   <GL/glew.h>
-#include <GL/freeglut.h>
+#include "gl.h"
 
 /*---------------------------------------------------------------------------*/
 
